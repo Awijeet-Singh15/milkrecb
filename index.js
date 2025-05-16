@@ -10,12 +10,16 @@ const { authenticate } = require('./middleware/auth');
 require('dotenv').config();
 
 const app = express();
-app.use(cors({ origin: "https://milkrecf.vercel.app", credentials: true }));
+
+app.use(cors({ origin:"https://milkrecf.vercel.app", credentials: true }));
 app.use(express.json());
 
-mongoose.connect(process.env.MONGODB_URL)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.log(err));
+mongoose.connect(process.env.MONGODB_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/milk', authenticate, milkRoutes);
@@ -39,16 +43,15 @@ app.get('/', (req, res) => {
         </style>
       </head>
       <body>
-        <h1>🥛 Milk Record Portal is Running 🎉</h1>
+        <h1>🥛 Milk Record Portal is Running ✨</h1>
       </body>
     </html>
   `);
 });
 
-//const PORT = process.env.PORT || 5000;
-// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`🛠️ Server running on http://localhost:${PORT}`));
+}
 
 module.exports = app; 
-
-
-
