@@ -1,0 +1,53 @@
+// === BACKEND (Node.js + Express) ===
+// server/server.js
+
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const authRoutes = require('./routes/auth');
+const milkRoutes = require('./routes/milk');
+const { authenticate } = require('./middleware/auth');
+require('dotenv').config();
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+mongoose.connect(process.env.MONGODB_URL)
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.log(err));
+
+app.use('/api/auth', authRoutes);
+app.use('/api/milk', authenticate, milkRoutes);
+
+app.get('/', (req, res) => {
+  res.send(`
+    <html>
+      <head>
+        <title>Milk Portal</title>
+        <style>
+          body {
+            background-color: #f0fff0;
+            font-family: sans-serif;
+            text-align: center;
+            padding-top: 100px;
+          }
+          h1 {
+            color: green;
+            font-size: 3em;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>🥛 Milk Record Portal is Running 🎉</h1>
+      </body>
+    </html>
+  `);
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+
+
